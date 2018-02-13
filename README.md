@@ -1,4 +1,4 @@
-# Deep Learing Test Task
+# Deep Learning Test Task
 Classifying Ciphar-10 dataset using LeNet-5 Architecture
 
 *Disclaimer:* 
