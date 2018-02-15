@@ -41,16 +41,16 @@ print(x_valid.shape[0], 'validation samples')
 
 
 # model = Sequential()
-# model.add(Conv2D(filters=6, kernel_size=5, strides=1, padding='same', 
-#     activation='relu', input_shape=(32, 32, 3), kernel_constraint= non_neg()))
+# model.add(Conv2D(filters=6, kernel_size=5, strides=1, padding='valid', 
+#     activation='relu', input_shape=(32, 32, 3)))
 # model.add(MaxPooling2D(pool_size=2, strides=2))
-# model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', 
+# model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='valid', 
 #     activation='relu'))
 # model.add(MaxPooling2D(pool_size=2, strides=2))
-# model.add(Conv2D(filters=120, kernel_size=5, strides=1, padding='same', 
+# model.add(Conv2D(filters=120, kernel_size=5, strides=1, padding='valid', 
 #     activation='relu'))
 # model.add(Flatten())
-# model.add(Dense(84, activation='relu'))
+# model.add(Dense(84, activation='tanh'))
 # model.add(Dense(10, activation='softmax'))
 # model.summary()
 
@@ -59,7 +59,7 @@ print(x_valid.shape[0], 'validation samples')
 
 model = Sequential()
 model.add(Conv2D(filters=6, kernel_size=11, strides=1, padding='same', 
-    activation='relu', input_shape=(32, 32, 3), kernel_constraint= non_neg()))
+    activation='relu', input_shape=(32, 32, 3)))
 model.add(MaxPooling2D(pool_size=2, strides=2))
 model.add(Conv2D(filters=16, kernel_size=11, strides=1, padding='same', 
     activation='relu'))
@@ -162,7 +162,29 @@ np.shape(w2)
 #replace the 5 with the filterIndex
 w2 = w2[:,:,:,5]
 
-plt.imshow(w2)
+
+#re-scale the weights to the range 0.0 - 1.0
+
+#change according to kernel size
+
+k_size = 5
+
+max = -199
+for i in range(k_size):
+    for j in range(k_size):
+        for k in range(3):
+            if(np.abs(w2[i][j][k])>max):
+                max = np.abs(w2[i][j][k])
+
+
+for i in range(k_size):
+    for j in range(k_size):
+        for k in range(3):
+                w2[i][j][k] = (1/(2*max)) * w2[i][j][k] + 0.5
+                
+
+
+plt.imshow(w2, interpolation='none')
 plt.show()
 #Code for generating the plotted graphs of accuracy and loss
 
