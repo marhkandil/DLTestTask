@@ -10,6 +10,7 @@ from keras.callbacks import ModelCheckpoint
 from scipy.misc import imsave
 import time
 from keras import backend as K
+from keras.constraints import non_neg
 
 
 # load the pre-shuffled train and test data
@@ -40,16 +41,16 @@ print(x_valid.shape[0], 'validation samples')
 
 
 # model = Sequential()
-# model.add(Conv2D(filters=6, kernel_size=5, strides=1, padding='valid', 
-#     activation='relu', input_shape=(32, 32, 3)))
+# model.add(Conv2D(filters=6, kernel_size=5, strides=1, padding='same', 
+#     activation='relu', input_shape=(32, 32, 3), kernel_constraint= non_neg()))
 # model.add(MaxPooling2D(pool_size=2, strides=2))
-# model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='valid', 
+# model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', 
 #     activation='relu'))
 # model.add(MaxPooling2D(pool_size=2, strides=2))
-# model.add(Conv2D(filters=120, kernel_size=5, strides=1, padding='valid', 
+# model.add(Conv2D(filters=120, kernel_size=5, strides=1, padding='same', 
 #     activation='relu'))
 # model.add(Flatten())
-# model.add(Dense(84, activation='tanh'))
+# model.add(Dense(84, activation='relu'))
 # model.add(Dense(10, activation='softmax'))
 # model.summary()
 
@@ -58,7 +59,7 @@ print(x_valid.shape[0], 'validation samples')
 
 model = Sequential()
 model.add(Conv2D(filters=6, kernel_size=11, strides=1, padding='same', 
-    activation='relu', input_shape=(32, 32, 3)))
+    activation='relu', input_shape=(32, 32, 3), kernel_constraint= non_neg()))
 model.add(MaxPooling2D(pool_size=2, strides=2))
 model.add(Conv2D(filters=16, kernel_size=11, strides=1, padding='same', 
     activation='relu'))
@@ -66,12 +67,12 @@ model.add(MaxPooling2D(pool_size=2, strides=2))
 model.add(Conv2D(filters=120, kernel_size=11, strides=1, padding='same', 
     activation='relu'))
 model.add(Flatten())
-model.add(Dense(84, activation='tanh'))
+model.add(Dense(84, activation='relu'))
 model.add(Dense(10, activation='softmax'))
 model.summary()
 
 # compile the model
-adm = keras.optimizers.Adam(lr=0.001)
+adm = keras.optimizers.Adam(lr=0.0003)
 model.compile(loss='categorical_crossentropy', optimizer=adm, 
                   metrics=['accuracy'])
 
@@ -98,7 +99,7 @@ img_height =32
 
 # the name of the layer we want to visualize 
 # (see model definition at keras/applications/vgg16.py)
-layer_name = 'conv2d_31'
+layer_name = 'conv2d_1'
 
 # util function to convert a tensor into a valid image
 
@@ -153,6 +154,16 @@ img = input_img_data[0]
 img = deprocess_image(img)
 imsave('%s_filter_%d.png' % (layer_name, filter_index), img)
 
+#Code for plotting out the weights of each of the filters in the first layer of the network
+
+w2 = model.layers[0].get_weights()[0]
+#View shape of the np-array
+np.shape(w2)
+#replace the 5 with the filterIndex
+w2 = w2[:,:,:,5]
+
+plt.imshow(w2)
+plt.show()
 #Code for generating the plotted graphs of accuracy and loss
 
 def plot_model_history(model_history):
